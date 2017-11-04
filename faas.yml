@@ -33,7 +33,7 @@ spec:
       serviceAccountName: faas-controller
       containers:
       - name: faas-netesd
-        image: functions/faas-netesd:0.3.1c
+        image: ems5311/faas-netesd:replicaStatus
 
         imagePullPolicy: Always
         ports:
@@ -69,7 +69,7 @@ spec:
     spec:
       containers:
       - name: gateway
-        image: functions/gateway:0.6.6b
+        image: ems5311/gateway:replicaStatus
 #k8s-monitoring-dev
         imagePullPolicy: Always
         env:
