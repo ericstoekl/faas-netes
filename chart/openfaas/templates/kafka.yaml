@@ -1,4 +1,23 @@
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ template "openfaas.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: zookeeper
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: zookeeper
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 2181
+      protocol: TCP
+  selector:
+    app: zookeeper
+---
 apiVersion: apps/v1beta1 # for versions before 1.6.0 use extensions/v1beta1
 kind: Deployment
 metadata:
@@ -37,17 +56,17 @@ metadata:
     component: 
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
-  name: kafka
+  name: broker
   namespace: {{ .Release.Namespace | quote }}
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: kafka
+        app: broker
     spec:
       containers:
-      - name: kafka
+      - name: broker
         image: {{ .Values.images.kafka }}
         imagePullPolicy: Always
         env:
@@ -65,10 +84,10 @@ metadata:
   labels:
     app: {{ template "openfaas.name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: kafka
+    component: broker
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
-  name: kafka
+  name: broker
   namespace: {{ .Release.Namespace | quote }}
 spec:
   type: ClusterIP
@@ -76,7 +95,7 @@ spec:
     - port: 9092
       protocol: TCP
   selector:
-    app: kafka
+    app: broker
 ---
 apiVersion: apps/v1beta1 # for versions before 1.6.0 use extensions/v1beta1
 kind: Deployment
@@ -87,17 +106,17 @@ metadata:
     component: 
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
-  name: kafka-connector
+  name: kafkaconnector
   namespace: {{ .Release.Namespace | quote }}
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: kafka-connector
+        app: kafkaconnector
     spec:
       containers:
-      - name: kafka-connector
-        image: {{ .Values.images.kafka-connector }}
+      - name: kafkaconnector
+        image: {{ .Values.images.kafkaconnector }}
         imagePullPolicy: Always
 ---

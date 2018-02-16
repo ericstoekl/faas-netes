@@ -40,7 +40,7 @@ images:
 
   zookeeper: confluentinc/cp-zookeeper:3.2.1
   kafka: confluentinc/cp-kafka:4.0.0
-  kafka-connector: ems5311/kafka-connector:latest
+  kafkaconnector: ems5311/kafka-connector:latest
 
 # ingress configuration
 ingress:
