@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	v1 "k8s.io/api/core/v1"
 )
 
 // OsEnv implements interface to wrap os.Getenv
@@ -57,9 +59,11 @@ func (ReadConfig) Read(hasEnv HasEnv) BootstrapConfig {
 
 	readTimeout := parseIntOrDurationValue(hasEnv.Getenv("read_timeout"), time.Second*10)
 	writeTimeout := parseIntOrDurationValue(hasEnv.Getenv("write_timeout"), time.Second*10)
+	imagePullPolicy := hasEnv.Getenv("image_pull_policy")
 
 	cfg.ReadTimeout = readTimeout
 	cfg.WriteTimeout = writeTimeout
+	cfg.ImagePullPolicy = v1.PullPolicy(imagePullPolicy)
 
 	cfg.EnableFunctionReadinessProbe = enableProbe
 
@@ -71,4 +75,5 @@ type BootstrapConfig struct {
 	EnableFunctionReadinessProbe bool
 	ReadTimeout                  time.Duration
 	WriteTimeout                 time.Duration
+	ImagePullPolicy              v1.PullPolicy
 }

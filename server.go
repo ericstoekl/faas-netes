@@ -41,15 +41,12 @@ func main() {
 	log.Printf("HTTP Read Timeout: %s\n", cfg.ReadTimeout)
 	log.Printf("HTTP Write Timeout: %s\n", cfg.WriteTimeout)
 	log.Printf("Function Readiness Probe Enabled: %v\n", cfg.EnableFunctionReadinessProbe)
-
-	deployConfig := &handlers.DeployHandlerConfig{
-		EnableFunctionReadinessProbe: cfg.EnableFunctionReadinessProbe,
-	}
+	log.Printf("Image Pull Policy Setting: %v\n", cfg.ImagePullPolicy)
 
 	bootstrapHandlers := bootTypes.FaaSHandlers{
 		FunctionProxy:  handlers.MakeProxy(functionNamespace, cfg.ReadTimeout),
 		DeleteHandler:  handlers.MakeDeleteHandler(functionNamespace, clientset),
-		DeployHandler:  handlers.MakeDeployHandler(functionNamespace, clientset, deployConfig),
+		DeployHandler:  handlers.MakeDeployHandler(functionNamespace, clientset, &cfg),
 		FunctionReader: handlers.MakeFunctionReader(functionNamespace, clientset),
 		ReplicaReader:  handlers.MakeReplicaReader(functionNamespace, clientset),
 		ReplicaUpdater: handlers.MakeReplicaUpdater(functionNamespace, clientset),

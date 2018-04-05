@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/openfaas/faas-netes/types"
 	"github.com/openfaas/faas/gateway/requests"
 	apiv1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
@@ -44,13 +45,8 @@ func ValidateDeployRequest(request *requests.CreateFunctionRequest) error {
 	return fmt.Errorf("(%s) must be a valid DNS entry for service name", request.Service)
 }
 
-// DeployHandlerConfig specify options for Deployments
-type DeployHandlerConfig struct {
-	EnableFunctionReadinessProbe bool
-}
-
 // MakeDeployHandler creates a handler to create new functions in the cluster
-func MakeDeployHandler(functionNamespace string, clientset *kubernetes.Clientset, config *DeployHandlerConfig) http.HandlerFunc {
+func MakeDeployHandler(functionNamespace string, clientset *kubernetes.Clientset, config *types.BootstrapConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
@@ -115,7 +111,7 @@ func MakeDeployHandler(functionNamespace string, clientset *kubernetes.Clientset
 	}
 }
 
-func makeDeploymentSpec(request requests.CreateFunctionRequest, existingSecrets map[string]*apiv1.Secret, config *DeployHandlerConfig) (*v1beta1.Deployment, error) {
+func makeDeploymentSpec(request requests.CreateFunctionRequest, existingSecrets map[string]*apiv1.Secret, config *types.BootstrapConfig) (*v1beta1.Deployment, error) {
 	envVars := buildEnvVars(&request)
 	path := filepath.Join(os.TempDir(), ".lock")
 	probe := &apiv1.Probe{
@@ -197,7 +193,7 @@ func makeDeploymentSpec(request requests.CreateFunctionRequest, existingSecrets 
 							},
 							Env:             envVars,
 							Resources:       *resources,
-							ImagePullPolicy: v1.PullAlways,
+							ImagePullPolicy: config.ImagePullPolicy,
 							LivenessProbe:   probe,
 							ReadinessProbe:  probe,
 						},
